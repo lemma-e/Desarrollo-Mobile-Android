@@ -70,6 +70,11 @@ fun main(){
     println("////////")
     val c = setOf(1,2,3,4,5)
     println(c.promedio())
+
+    println("///")
+    val p = Persona("Ing", "Manu", 5)
+    println("El nombre de la persona es: ${p.fullName()}")
+    println(p.edad)
 }
 
 fun saludar(saludo: String): String{
