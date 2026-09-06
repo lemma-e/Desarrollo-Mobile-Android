@@ -51,5 +51,43 @@ fun main(){
 
     val l7 = mutableMapOf(2 to "dosh")
     l7[1] = "tres"
+    l7.put(3,"nose")
     println(l7)
+
+    println("/////////////")
+    val doble = Pair("hola", 1)
+    println(doble)
+    println("////////////")
+    //if else - when - dowhile - try/catch - for in
+    val saludo = "saludo metodo"
+
+    println(saludar(saludo))
+    println("////////////")
+    val res = sumar(a=1, b=2)
+    println(res)
+    val res2 = sumar(a=1, b="hello world!")
+    println(res2)
+    println("////////")
+    val c = setOf(1,2,3,4,5)
+    println(c.promedio())
+}
+
+fun saludar(saludo: String): String{
+    return "$saludo contatenado"
+}
+
+fun sumar(a: Int, b:Any): Int{
+    if(b is Int){
+        return a + b
+    }else {
+        return a
+    }
+}
+
+fun Set<Int>.promedio(): Double{
+    var sum = 0
+    for(e in this){
+        sum += e
+    }
+    return  sum.toDouble() / this.size
 }
