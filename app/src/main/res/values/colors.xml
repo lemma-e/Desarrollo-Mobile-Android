@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+
+    <!-- Violetas -->
+    <color name="purple">#6200EE</color>
+    <color name="purple_dark">#3700B3</color>
+    <color name="purple_light">#BB86FC</color>
+
+    <!-- Turquesas -->
+    <color name="teal">#03DAC6</color>
+    <color name="teal_dark">#018786</color>
+
+    <!-- Neutros -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="dark_background">#121212</color>
+
+    <!-- Error -->
+    <color name="red">#B00020</color>
+    <color name="red_light">#CF6679</color>
+
 </resources>

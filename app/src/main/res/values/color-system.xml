@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="primary">@color/purple</color>
+    <color name="primary_variant">@color/purple_dark</color>
+
+    <color name="secondary">@color/teal</color>
+    <color name="secondary_variant">@color/teal_dark</color>
+
+    <color name="background">@color/white</color>
+    <color name="surface">@color/white</color>
+
+    <color name="error">@color/red</color>
+
+    <color name="on_primary">@color/white</color>
+    <color name="on_secondary">@color/black</color>
+    <color name="on_background">@color/black</color>
+    <color name="on_surface">@color/black</color>
+    <color name="on_error">@color/white</color>
+
+</resources>
