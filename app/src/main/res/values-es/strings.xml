@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">CineBox</string>
     <string name="hello_world">Hola mundo!</string>
+    <string name="click_me_test">Haz click</string>
+    <string name="complete_test">Test completado</string>
 </resources>
