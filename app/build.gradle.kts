@@ -61,4 +61,8 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     implementation(libs.retrofit)
     implementation(libs.retrofit.gson)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.glide)
 }
