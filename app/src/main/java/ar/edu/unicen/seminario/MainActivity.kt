@@ -10,6 +10,8 @@ import ar.edu.unicen.seminario.ui.popular.MovieAdapter
 import ar.edu.unicen.seminario.ui.popular.MovieLoadError
 import ar.edu.unicen.seminario.ui.popular.MovieViewModel
 import ar.edu.unicen.seminario.ui.popular.MoviesUiState
+import android.content.Intent
+import ar.edu.unicen.seminario.ui.detail.MovieDetailsActivity
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -20,7 +22,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        movieAdapter = MovieAdapter()
+        movieAdapter = MovieAdapter {
+            movie -> val intent = Intent(this, MovieDetailsActivity::class.java)
+            intent.putExtra(MovieDetailsActivity.EXTRA_MOVIE_ID, movie.id)
+            startActivity(intent)
+        }
         binding.moviesRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.moviesRecyclerView.adapter = movieAdapter
         viewModel = ViewModelProvider(this)[MovieViewModel::class.java]

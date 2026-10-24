@@ -9,4 +9,14 @@
     <string name="retry">Retry</string>
     <string name="error_connection">Connection error. Check your internet connection.</string>
     <string name="error_server">Unable to get movies from the server.</string>
+    <string name="movie_poster">Movie poster</string>
+    <string name="movie_genres">Genres</string>
+    <string name="movie_rating">Rating</string>
+    <string name="movie_overview">Overview</string>
+    <string name="loading_details">Loading movie details</string>
+    <string name="details_load_error">Unable to load movie details</string>
+    <string name="details_invalid_id">Invalid movie</string>
+    <string name="details_no_overview">No overview available</string>
+    <string name="details_no_genres">No genres available</string>
+    <string name="movie_rating_value">%1$.1f/10</string>
 </resources>
