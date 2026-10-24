@@ -7,7 +7,7 @@ import ar.edu.unicen.seminario.databinding.ItemMovieBinding
 import ar.edu.unicen.seminario.model.Movie
 import com.bumptech.glide.Glide
 
-class MovieAdapter : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
+class MovieAdapter(private val onMovieClick: (Movie) -> Unit) : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>()  {
     private var movies: List<Movie> = emptyList()
 
     fun updateMovies(newMovies: List<Movie>) {
@@ -27,11 +27,12 @@ class MovieAdapter : RecyclerView.Adapter<MovieAdapter.MovieViewHolder>() {
         return MovieViewHolder(binding)
     }
 
-    override fun onBindViewHolder(
-        holder: MovieViewHolder,
-        position: Int
-    ) {
-        holder.bind(movies[position])
+    override fun onBindViewHolder(holder: MovieViewHolder, position: Int) {
+        val movie = movies[position]
+        holder.bind(movie)
+        holder.itemView.setOnClickListener {
+            onMovieClick(movie)
+        }
     }
 
     override fun getItemCount(): Int {

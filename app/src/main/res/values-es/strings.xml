@@ -10,4 +10,14 @@
     <string name="retry">Reintentar</string>
     <string name="error_connection">Error de conexión. Revisá tu conexión a Internet.</string>
     <string name="error_server">No se pudieron obtener las películas del servidor.</string>
+    <string name="movie_poster">Portada de la película</string>
+    <string name="movie_genres">Géneros</string>
+    <string name="movie_rating">Calificación</string>
+    <string name="movie_overview">Sinopsis</string>
+    <string name="loading_details">Cargando detalles de la película</string>
+    <string name="details_load_error">No se pudieron cargar los detalles de la película</string>
+    <string name="details_invalid_id">Película no válida</string>
+    <string name="details_no_overview">Sin sinopsis disponible</string>
+    <string name="details_no_genres">Sin géneros disponibles</string>
+    <string name="movie_rating_value">%1$.1f/10</string>
 </resources>
