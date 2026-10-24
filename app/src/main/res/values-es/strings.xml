@@ -4,4 +4,10 @@
     <string name="hello_world">Hola mundo!</string>
     <string name="click_me_test">Haz click</string>
     <string name="complete_test">Test completado</string>
+    <string name="popular_movies">Películas populares</string>
+    <string name="loading_movies">Cargando películas</string>
+    <string name="movies_load_error">No se pudieron cargar las películas</string>
+    <string name="retry">Reintentar</string>
+    <string name="error_connection">Error de conexión. Revisá tu conexión a Internet.</string>
+    <string name="error_server">No se pudieron obtener las películas del servidor.</string>
 </resources>
