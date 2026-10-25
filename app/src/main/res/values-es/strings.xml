@@ -20,4 +20,6 @@
     <string name="details_no_overview">Sin sinopsis disponible</string>
     <string name="details_no_genres">Sin géneros disponibles</string>
     <string name="movie_rating_value">%1$.1f/10</string>
+    <string name="search_movies_hint">Buscar películas...</string>
+    <string name="no_search_results">No se encontraron películas para tu búsqueda</string>
 </resources>

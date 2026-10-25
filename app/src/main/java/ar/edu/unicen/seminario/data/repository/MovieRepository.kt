@@ -4,6 +4,11 @@ import ar.edu.unicen.seminario.BuildConfig
 import ar.edu.unicen.seminario.data.remote.TmdbRetrofitClient
 import ar.edu.unicen.seminario.model.Movie
 import ar.edu.unicen.seminario.model.MovieDetails
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import ar.edu.unicen.seminario.data.paging.MoviePagingSource
+import kotlinx.coroutines.flow.Flow
 
 class MovieRepository {
     private val authorization = "Bearer ${BuildConfig.TMDB_ACCESS_TOKEN}"
@@ -14,5 +19,29 @@ class MovieRepository {
 
     suspend fun getMovieDetails(movieId: Int): MovieDetails {
         return TmdbRetrofitClient.apiService.getMovieDetails(movieId, authorization)
+    }
+
+    suspend fun searchMovies(query: String): List<Movie> {
+
+        val response = TmdbRetrofitClient.apiService
+            .searchMovies(query, authorization)
+
+        return response.results
+    }
+
+    fun getPagedPopularMovies(): Flow<PagingData<Movie>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                initialLoadSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                MoviePagingSource(
+                    TmdbRetrofitClient.apiService,
+                    authorization
+                )
+            }
+        ).flow
     }
 }
