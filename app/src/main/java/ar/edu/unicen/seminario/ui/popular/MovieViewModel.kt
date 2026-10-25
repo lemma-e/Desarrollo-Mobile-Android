@@ -10,6 +10,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 enum class MovieLoadError {
     CONNECTION,
@@ -19,7 +21,7 @@ enum class MovieLoadError {
 
 sealed class MoviesUiState {
     object Loading : MoviesUiState()
-    data class Success(val movies: List<Movie>) : MoviesUiState()
+    data class Success(val movies: List<Movie>, val isSearch: Boolean = false) : MoviesUiState()
     data class Error(val reason: MovieLoadError) : MoviesUiState()
 }
 
@@ -27,19 +29,42 @@ class MovieViewModel : ViewModel() {
     private val repository = MovieRepository()
     private val _uiState = MutableLiveData<MoviesUiState>()
     val uiState: LiveData<MoviesUiState> = _uiState
+    private var currentQuery = ""
+    private var requestJob: Job? = null
 
     init { loadPopularMovies() }
 
     fun loadPopularMovies() {
-        _uiState.value = MoviesUiState.Loading
-        viewModelScope.launch {
-            try {
-                val movies = repository.getPopularMovies()
-                _uiState.value = MoviesUiState.Success(movies)
+        currentQuery = ""
+        loadMovies()
+    }
 
-                //arreglar exepciones
-                //añadidas los catch
-                //si da un error me muero
+    fun searchMovies(query: String) {
+        currentQuery = query.trim()
+        loadMovies()
+    }
+
+    fun retry() {
+        loadMovies()
+    }
+
+    private fun loadMovies() {
+        requestJob?.cancel()
+        val query = currentQuery
+        val isSearch = query.isNotEmpty()
+        _uiState.value = MoviesUiState.Loading
+        requestJob = viewModelScope.launch {
+            try {
+                val movies = if (isSearch) {
+                    delay(350)
+                    repository.searchMovies(query)
+                } else {
+                    repository.getPopularMovies()
+                }
+                _uiState.value = MoviesUiState.Success(
+                    movies,
+                    isSearch
+                )
             } catch (e: CancellationException) {
                 throw e
             } catch (e: IOException) {

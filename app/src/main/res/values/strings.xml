@@ -19,4 +19,6 @@
     <string name="details_no_overview">No overview available</string>
     <string name="details_no_genres">No genres available</string>
     <string name="movie_rating_value">%1$.1f/10</string>
+    <string name="search_movies_hint">Search movies...</string>
+    <string name="no_search_results">No movies found for your search</string>
 </resources>

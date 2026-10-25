@@ -12,6 +12,8 @@ import ar.edu.unicen.seminario.ui.popular.MovieViewModel
 import ar.edu.unicen.seminario.ui.popular.MoviesUiState
 import android.content.Intent
 import ar.edu.unicen.seminario.ui.detail.MovieDetailsActivity
+import android.text.Editable
+import android.text.TextWatcher
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -39,16 +41,22 @@ class MainActivity : AppCompatActivity() {
                 }
                 is MoviesUiState.Success -> {
                     binding.loadingProgressBar.visibility = View.GONE
-                    binding.moviesRecyclerView.visibility = View.VISIBLE
-                    binding.errorLayout.visibility = View.GONE
-
-                    movieAdapter.updateMovies(state.movies)
+                    if (state.isSearch && state.movies.isEmpty()) {
+                        binding.moviesRecyclerView.visibility = View.GONE
+                        binding.errorLayout.visibility = View.VISIBLE
+                        binding.errorTextView.setText(R.string.no_search_results)
+                        binding.retryButton.visibility = View.GONE
+                    } else {
+                        binding.moviesRecyclerView.visibility = View.VISIBLE
+                        binding.errorLayout.visibility = View.GONE
+                        movieAdapter.updateMovies(state.movies)
+                    }
                 }
                 is MoviesUiState.Error -> {
                     binding.loadingProgressBar.visibility = View.GONE
                     binding.moviesRecyclerView.visibility = View.GONE
                     binding.errorLayout.visibility = View.VISIBLE
-
+                    binding.retryButton.visibility = View.VISIBLE
                     val errorMessage = when (state.reason) {
                         MovieLoadError.CONNECTION -> R.string.error_connection
                         MovieLoadError.SERVER -> R.string.error_server
@@ -59,8 +67,29 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        binding.searchMovieEditText.addTextChangedListener(
+            object : TextWatcher {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) {
+                }
+                override fun onTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    before: Int,
+                    count: Int
+                ) {
+                    viewModel.searchMovies(s?.toString().orEmpty())
+                }
+                override fun afterTextChanged(s: Editable?) {
+                }
+            }
+        )
         binding.retryButton.setOnClickListener {
-            viewModel.loadPopularMovies()
+            viewModel.retry()
         }
     }
 }

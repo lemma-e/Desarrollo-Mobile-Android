@@ -15,4 +15,12 @@ class MovieRepository {
     suspend fun getMovieDetails(movieId: Int): MovieDetails {
         return TmdbRetrofitClient.apiService.getMovieDetails(movieId, authorization)
     }
+
+    suspend fun searchMovies(query: String): List<Movie> {
+
+        val response = TmdbRetrofitClient.apiService
+            .searchMovies(query, authorization)
+
+        return response.results
+    }
 }
