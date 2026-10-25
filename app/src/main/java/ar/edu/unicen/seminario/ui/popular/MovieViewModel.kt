@@ -12,6 +12,9 @@ import retrofit2.HttpException
 import java.io.IOException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import kotlinx.coroutines.flow.Flow
 
 enum class MovieLoadError {
     CONNECTION,
@@ -27,6 +30,7 @@ sealed class MoviesUiState {
 
 class MovieViewModel : ViewModel() {
     private val repository = MovieRepository()
+    val pagedPopularMovies: Flow<PagingData<Movie>> = repository.getPagedPopularMovies().cachedIn(viewModelScope)
     private val _uiState = MutableLiveData<MoviesUiState>()
     val uiState: LiveData<MoviesUiState> = _uiState
     private var currentQuery = ""

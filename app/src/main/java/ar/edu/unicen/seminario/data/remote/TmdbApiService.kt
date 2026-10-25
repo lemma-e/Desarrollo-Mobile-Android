@@ -10,7 +10,8 @@ import retrofit2.http.Query
 interface TmdbApiService {
     @GET("movie/popular")
     suspend fun getPopularMovies(
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        @Query("page") page: Int = 1
     ): PopularMoviesResponse
 
     @GET("movie/{movie_id}")

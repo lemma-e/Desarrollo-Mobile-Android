@@ -55,6 +55,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.paging.common)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -65,4 +66,5 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata.ktx)
     implementation(libs.androidx.recyclerview)
     implementation(libs.glide)
+    implementation(libs.androidx.paging.runtime)
 }
