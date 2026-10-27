@@ -29,6 +29,13 @@ class MovieDetailsActivity : AppCompatActivity() {
             return
         }
         viewModel = ViewModelProvider(this)[MovieDetailsViewModel::class.java]
+        viewModel.isSaved.observe(this) { saved ->
+            if (saved) {
+                binding.watchlistButton.setText(R.string.remove_from_watchlist)
+            } else {
+                binding.watchlistButton.setText(R.string.add_to_watchlist)
+            }
+        }
         viewModel.uiState.observe(this) { state ->
             when (state) {
                 is MovieDetailsUiState.Loading -> {
@@ -41,6 +48,10 @@ class MovieDetailsActivity : AppCompatActivity() {
                     binding.detailsScrollView.visibility = View.VISIBLE
                     binding.detailsErrorLayout.visibility = View.GONE
                     showMovieDetails(state.movie)
+                    viewModel.checkWatchlist(state.movie.id)
+                    binding.watchlistButton.setOnClickListener {
+                        viewModel.toggleWatchlist(state.movie)
+                    }
                 }
                 is MovieDetailsUiState.Error -> {
                     binding.detailsProgressBar.visibility = View.GONE

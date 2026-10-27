@@ -22,4 +22,9 @@
     <string name="movie_rating_value">%1$.1f/10</string>
     <string name="search_movies_hint">Buscar películas...</string>
     <string name="no_search_results">No se encontraron películas para tu búsqueda</string>
+    <string name="add_to_watchlist">Agregar a mi lista</string>
+    <string name="remove_from_watchlist">Quitar de mi lista</string>
+    <string name="my_watchlist">Mi lista</string>
+    <string name="empty_watchlist">Todavía no guardaste películas</string>
+    <string name="trending_movies">Tendencias</string>
 </resources>

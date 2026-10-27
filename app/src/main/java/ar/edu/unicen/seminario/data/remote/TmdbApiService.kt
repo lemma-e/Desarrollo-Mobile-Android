@@ -25,4 +25,9 @@ interface TmdbApiService {
         @Query("query") query: String,
         @Header("Authorization") authorization: String
     ): PopularMoviesResponse
+
+    @GET("trending/movie/week")
+    suspend fun getTrendingMovies(
+        @Header("Authorization") authorization: String
+    ): PopularMoviesResponse
 }

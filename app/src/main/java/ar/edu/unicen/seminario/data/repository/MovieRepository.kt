@@ -44,4 +44,11 @@ class MovieRepository {
             }
         ).flow
     }
+
+    suspend fun getTrendingMovies(): List<Movie> {
+        val response = TmdbRetrofitClient.apiService
+            .getTrendingMovies(authorization)
+        return response.results
+    }
+
 }

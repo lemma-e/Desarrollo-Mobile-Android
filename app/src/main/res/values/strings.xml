@@ -21,4 +21,9 @@
     <string name="movie_rating_value">%1$.1f/10</string>
     <string name="search_movies_hint">Search movies...</string>
     <string name="no_search_results">No movies found for your search</string>
+    <string name="add_to_watchlist">Add to watchlist</string>
+    <string name="remove_from_watchlist">Remove from watchlist</string>
+    <string name="my_watchlist">My list</string>
+    <string name="empty_watchlist">Your watchlist is empty</string>
+    <string name="trending_movies">Trending</string>
 </resources>

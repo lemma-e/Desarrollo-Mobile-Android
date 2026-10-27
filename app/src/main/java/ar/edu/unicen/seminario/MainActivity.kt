@@ -24,6 +24,8 @@ import androidx.paging.LoadState
 import ar.edu.unicen.seminario.model.Movie
 import ar.edu.unicen.seminario.ui.popular.MoviePagingAdapter
 import ar.edu.unicen.seminario.ui.popular.MovieLoadStateAdapter
+import ar.edu.unicen.seminario.ui.watchlist.WatchlistViewModel
+import ar.edu.unicen.seminario.ui.trending.TrendingViewModel
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -31,6 +33,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var movieAdapter: MovieAdapter
     private lateinit var pagingAdapter: MoviePagingAdapter
     private var popularLoadStates: CombinedLoadStates? = null
+    private lateinit var watchlistViewModel: WatchlistViewModel
+    private lateinit var watchlistAdapter: MovieAdapter
+    private var showingWatchlist = false
+    private lateinit var trendingViewModel: TrendingViewModel
+    private lateinit var trendingAdapter: MovieAdapter
+    private var showingTrending = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +46,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         movieAdapter = MovieAdapter { movie -> openMovieDetails(movie) }
         pagingAdapter = MoviePagingAdapter { movie -> openMovieDetails(movie) }
+        watchlistAdapter = MovieAdapter { movie -> openMovieDetails(movie) }
+        trendingAdapter = MovieAdapter { movie -> openMovieDetails(movie) }
         val pagingAdapterConFooter = pagingAdapter.withLoadStateFooter(
             footer = MovieLoadStateAdapter {
                 pagingAdapter.retry()
@@ -46,9 +56,11 @@ class MainActivity : AppCompatActivity() {
         binding.moviesRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.moviesRecyclerView.adapter = pagingAdapterConFooter
         viewModel = ViewModelProvider(this)[MovieViewModel::class.java]
+        watchlistViewModel = ViewModelProvider(this)[WatchlistViewModel::class.java]
+        trendingViewModel = ViewModelProvider(this)[TrendingViewModel::class.java]
         pagingAdapter.addLoadStateListener {
             loadStates -> popularLoadStates = loadStates
-            if (!isSearching()) {
+            if (!showingWatchlist && !showingTrending && !isSearching()) {
                 showPopularState()
             }
         }
@@ -59,8 +71,23 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        watchlistViewModel.movies.observe(this) {
+            movies -> watchlistAdapter.updateMovies(movies)
+            if (showingWatchlist) {
+                binding.loadingProgressBar.visibility = View.GONE
+                if (movies.isEmpty()) {
+                    binding.moviesRecyclerView.visibility = View.GONE
+                    binding.errorLayout.visibility = View.VISIBLE
+                    binding.errorTextView.setText(R.string.empty_watchlist)
+                    binding.retryButton.visibility = View.GONE
+                } else {
+                    binding.moviesRecyclerView.visibility = View.VISIBLE
+                    binding.errorLayout.visibility = View.GONE
+                }
+            }
+        }
         viewModel.uiState.observe(this) { state ->
-            if (!isSearching()) {
+            if (showingWatchlist || showingTrending || !isSearching()) {
                 return@observe
             }
 
@@ -103,6 +130,80 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_popular -> {
+                    showingWatchlist = false
+                    showingTrending = false
+                    binding.popularMoviesTitleTextView.setText(R.string.popular_movies)
+                    binding.searchMovieEditText.visibility = View.VISIBLE
+                    if (isSearching()) {
+                        binding.moviesRecyclerView.adapter = movieAdapter
+                        viewModel.searchMovies(binding.searchMovieEditText.text.toString())
+                    } else {
+                        binding.moviesRecyclerView.adapter = pagingAdapterConFooter
+                        showPopularState()
+                    }
+                    true
+                }
+                R.id.navigation_trending -> {
+                    showingWatchlist = false
+                    showingTrending = true
+                    binding.popularMoviesTitleTextView.setText(R.string.trending_movies)
+                    binding.searchMovieEditText.visibility = View.GONE
+                    binding.moviesRecyclerView.adapter = trendingAdapter
+                    binding.loadingProgressBar.visibility = View.VISIBLE
+                    binding.moviesRecyclerView.visibility = View.GONE
+                    binding.errorLayout.visibility = View.GONE
+                    trendingViewModel.loadTrendingMovies()
+                    true
+                }
+                R.id.navigation_watchlist -> {
+                    showingWatchlist = true
+                    binding.popularMoviesTitleTextView.setText(R.string.my_watchlist)
+                    binding.searchMovieEditText.visibility = View.GONE
+                    binding.moviesRecyclerView.adapter = watchlistAdapter
+                    binding.loadingProgressBar.visibility = View.VISIBLE
+                    binding.moviesRecyclerView.visibility = View.GONE
+                    binding.errorLayout.visibility = View.GONE
+                    watchlistViewModel.loadWatchlist()
+                    true
+                }
+                else -> false
+            }
+        }
+
+        trendingViewModel.uiState.observe(this) { state ->
+            if (!showingTrending) {
+                return@observe
+            }
+            when (state) {
+                is MoviesUiState.Loading -> {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
+                    binding.moviesRecyclerView.visibility = View.GONE
+                    binding.errorLayout.visibility = View.GONE
+                }
+                is MoviesUiState.Success -> {
+                    trendingAdapter.updateMovies(state.movies)
+                    binding.loadingProgressBar.visibility = View.GONE
+                    binding.moviesRecyclerView.visibility = View.VISIBLE
+                    binding.errorLayout.visibility = View.GONE
+                }
+                is MoviesUiState.Error -> {
+                    binding.loadingProgressBar.visibility = View.GONE
+                    binding.moviesRecyclerView.visibility = View.GONE
+                    binding.errorLayout.visibility = View.VISIBLE
+                    binding.retryButton.visibility = View.VISIBLE
+                    val errorMessage = when (state.reason) {
+                        MovieLoadError.CONNECTION -> R.string.error_connection
+                        MovieLoadError.SERVER -> R.string.error_server
+                        MovieLoadError.UNKNOWN -> R.string.movies_load_error
+                    }
+                    binding.errorTextView.setText(errorMessage)
+                }
+            }
+        }
+
         binding.searchMovieEditText.addTextChangedListener(
             object : TextWatcher {
                 override fun beforeTextChanged(
@@ -119,6 +220,9 @@ class MainActivity : AppCompatActivity() {
                     before: Int,
                     count: Int
                 ) {
+                    if (showingWatchlist || showingTrending) {
+                        return
+                    }
                     val query = s?.toString().orEmpty()
                     if (query.isBlank()) {
                         if (binding.moviesRecyclerView.adapter != pagingAdapterConFooter) {
@@ -138,7 +242,9 @@ class MainActivity : AppCompatActivity() {
         )
 
         binding.retryButton.setOnClickListener {
-            if (isSearching()) {
+            if (showingTrending) {
+                trendingViewModel.loadTrendingMovies()
+            } else if (isSearching()) {
                 viewModel.retry()
             } else {
                 pagingAdapter.retry()
