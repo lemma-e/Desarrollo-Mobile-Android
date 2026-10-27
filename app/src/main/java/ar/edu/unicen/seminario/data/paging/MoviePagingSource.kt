@@ -6,11 +6,14 @@ import ar.edu.unicen.seminario.data.remote.TmdbApiService
 import ar.edu.unicen.seminario.model.Movie
 import kotlinx.coroutines.CancellationException
 
-class MoviePagingSource(private val apiService: TmdbApiService, private val authorization: String) : PagingSource<Int, Movie>() {
+class MoviePagingSource(
+    private val apiService: TmdbApiService,
+    private val authorization: String,
+    private val language: String = "en-US") : PagingSource<Int, Movie>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Movie> {
         val page = params.key ?: 1
         return try {
-            val response = apiService.getPopularMovies(authorization, page)
+            val response = apiService.getPopularMovies(authorization, page, language)
             LoadResult.Page(
                 data = response.results,
                 prevKey = if (page == 1) null else page - 1,

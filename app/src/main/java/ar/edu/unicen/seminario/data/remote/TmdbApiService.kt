@@ -11,23 +11,42 @@ interface TmdbApiService {
     @GET("movie/popular")
     suspend fun getPopularMovies(
         @Header("Authorization") authorization: String,
-        @Query("page") page: Int = 1
+        @Query("page") page: Int = 1,
+        @Query("language") language: String = "en-US"
     ): PopularMoviesResponse
 
     @GET("movie/{movie_id}")
     suspend fun getMovieDetails(
         @Path("movie_id") movieId: Int,
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        @Query("language") language: String = "en-US"
     ): MovieDetails
 
     @GET("search/movie")
     suspend fun searchMovies(
         @Query("query") query: String,
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        @Query("language") language: String = "en-US"
     ): PopularMoviesResponse
 
     @GET("trending/movie/week")
     suspend fun getTrendingMovies(
-        @Header("Authorization") authorization: String
+        @Header("Authorization") authorization: String,
+        @Query("language") language: String = "en-US"
+    ): PopularMoviesResponse
+
+    @GET("movie/{movie_id}/similar")
+    suspend fun getSimilarMovies(
+        @Path("movie_id") movieId: Int,
+        @Header("Authorization") authorization: String,
+        @Query("language") language: String = "en-US"
+    ): PopularMoviesResponse
+
+
+    @GET("movie/{movie_id}/recommendations")
+    suspend fun getRecommendedMovies(
+        @Path("movie_id") movieId: Int,
+        @Header("Authorization") authorization: String,
+        @Query("language") language: String = "en-US"
     ): PopularMoviesResponse
 }
