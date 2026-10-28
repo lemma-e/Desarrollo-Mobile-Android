@@ -26,4 +26,8 @@
     <string name="my_watchlist">My list</string>
     <string name="empty_watchlist">Your watchlist is empty</string>
     <string name="trending_movies">Trending</string>
+    <string name="similar_movies">Similar movies</string>
+    <string name="recommended_movies">Recommended movies</string>
+    <string name="share_movie">Share movie</string>
+    <string name="open_homepage">Open official website</string>
 </resources>

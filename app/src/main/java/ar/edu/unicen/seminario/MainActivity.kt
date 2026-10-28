@@ -26,6 +26,8 @@ import ar.edu.unicen.seminario.ui.popular.MoviePagingAdapter
 import ar.edu.unicen.seminario.ui.popular.MovieLoadStateAdapter
 import ar.edu.unicen.seminario.ui.watchlist.WatchlistViewModel
 import ar.edu.unicen.seminario.ui.trending.TrendingViewModel
+import android.content.res.Configuration
+import androidx.recyclerview.widget.GridLayoutManager
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -53,7 +55,23 @@ class MainActivity : AppCompatActivity() {
                 pagingAdapter.retry()
             }
         )
-        binding.moviesRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        binding.moviesRecyclerView.layoutManager =
+            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                val gridLayoutManager = GridLayoutManager(this, 2)
+                gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        return if (binding.moviesRecyclerView.adapter == pagingAdapterConFooter && position >= pagingAdapter.itemCount) {
+                            2
+                        } else {
+                            1
+                        }
+                    }
+                }
+                gridLayoutManager
+            } else {
+                LinearLayoutManager(this)
+            }
         binding.moviesRecyclerView.adapter = pagingAdapterConFooter
         viewModel = ViewModelProvider(this)[MovieViewModel::class.java]
         watchlistViewModel = ViewModelProvider(this)[WatchlistViewModel::class.java]

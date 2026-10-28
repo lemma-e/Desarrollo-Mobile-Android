@@ -27,4 +27,8 @@
     <string name="my_watchlist">Mi lista</string>
     <string name="empty_watchlist">Todavía no guardaste películas</string>
     <string name="trending_movies">Tendencias</string>
+    <string name="similar_movies">Películas similares</string>
+    <string name="recommended_movies">Películas recomendadas</string>
+    <string name="share_movie">Compartir película</string>
+    <string name="open_homepage">Abrir página oficial</string>
 </resources>

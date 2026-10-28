@@ -10,7 +10,8 @@ data class MovieDetails(
     val overview: String?,
     val genres: List<MovieGenre>,
     @SerializedName("vote_average")
-    val voteAverage: Double
+    val voteAverage: Double,
+    val homepage: String? = null
 )
 data class MovieGenre(
     val id: Int,

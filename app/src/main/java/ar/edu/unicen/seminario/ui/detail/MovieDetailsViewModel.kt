@@ -14,6 +14,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import ar.edu.unicen.seminario.data.local.WatchlistRepository
 import ar.edu.unicen.seminario.model.Movie
+import ar.edu.unicen.seminario.ui.popular.MovieLoadError
+import ar.edu.unicen.seminario.ui.popular.MoviesUiState
 
 enum class MovieDetailsLoadError {
     CONNECTION,
@@ -34,6 +36,10 @@ class MovieDetailsViewModel(application: Application) : AndroidViewModel(applica
     private val watchlistRepository = WatchlistRepository(application)
     private val _isSaved = MutableLiveData<Boolean>()
     val isSaved: LiveData<Boolean> = _isSaved
+    private val _similarMoviesState = MutableLiveData<MoviesUiState>()
+    val similarMoviesState: LiveData<MoviesUiState> = _similarMoviesState
+    private val _recommendedMoviesState = MutableLiveData<MoviesUiState>()
+    val recommendedMoviesState: LiveData<MoviesUiState> = _recommendedMoviesState
 
     fun loadMovieDetails(movieId: Int) {
         _uiState.value = MovieDetailsUiState.Loading
@@ -80,6 +86,44 @@ class MovieDetailsViewModel(application: Application) : AndroidViewModel(applica
                 watchlistRepository.addMovie(newMovie)
             }
             _isSaved.value = !saved
+        }
+    }
+
+    fun loadSimilarMovies(movieId: Int) {
+        _similarMoviesState.value = MoviesUiState.Loading
+        viewModelScope.launch {
+            try {
+                val movies = repository.getSimilarMovies(movieId)
+                _similarMoviesState.value = MoviesUiState.Success(movies)
+
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                _similarMoviesState.value = MoviesUiState.Error(MovieLoadError.CONNECTION)
+            } catch (e: HttpException) {
+                _similarMoviesState.value = MoviesUiState.Error(MovieLoadError.SERVER)
+            } catch (e: Exception) {
+                _similarMoviesState.value = MoviesUiState.Error(MovieLoadError.UNKNOWN)
+            }
+        }
+    }
+
+    fun loadRecommendedMovies(movieId: Int) {
+        _recommendedMoviesState.value = MoviesUiState.Loading
+        viewModelScope.launch {
+            try {
+                val movies = repository.getRecommendedMovies(movieId)
+                _recommendedMoviesState.value = MoviesUiState.Success(movies)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                _recommendedMoviesState.value = MoviesUiState.Error(MovieLoadError.CONNECTION)
+            } catch (e: HttpException) {
+                _recommendedMoviesState.value = MoviesUiState.Error(MovieLoadError.SERVER)
+
+            } catch (e: Exception) {
+                _recommendedMoviesState.value = MoviesUiState.Error(MovieLoadError.UNKNOWN)
+            }
         }
     }
 }
