@@ -138,19 +138,8 @@ class MainActivity : AppCompatActivity() {
                         binding.errorLayout.visibility = View.GONE
                     }
                 }
-
                 is MoviesUiState.Error -> {
-                    binding.loadingProgressBar.visibility = View.GONE
-                    binding.moviesRecyclerView.visibility = View.GONE
-                    binding.errorLayout.visibility = View.VISIBLE
-                    binding.retryButton.visibility = View.VISIBLE
-                    val errorMessage = when (state.reason) {
-                        MovieLoadError.CONNECTION -> R.string.error_connection
-                        MovieLoadError.SERVER -> R.string.error_server
-                        MovieLoadError.UNKNOWN -> R.string.movies_load_error
-                    }
-                    binding.errorTextView.setText(errorMessage)
-                    binding.stateIconImageView.setImageResource(R.drawable.ic_state_error)
+                    showMoviesError(getErrorMessage(state.reason))
                 }
             }
         }
@@ -184,17 +173,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 is MoviesUiState.Error -> {
-                    binding.loadingProgressBar.visibility = View.GONE
-                    binding.moviesRecyclerView.visibility = View.GONE
-                    binding.errorLayout.visibility = View.VISIBLE
-                    binding.retryButton.visibility = View.VISIBLE
-                    val errorMessage = when (state.reason) {
-                        MovieLoadError.CONNECTION -> R.string.error_connection
-                        MovieLoadError.SERVER -> R.string.error_server
-                        MovieLoadError.UNKNOWN -> R.string.movies_load_error
-                    }
-                    binding.errorTextView.setText(errorMessage)
-                    binding.stateIconImageView.setImageResource(R.drawable.ic_state_error)
+                    showMoviesError(getErrorMessage(state.reason))
                 }
             }
         }
@@ -258,6 +237,23 @@ class MainActivity : AppCompatActivity() {
         return binding.searchMovieEditText.text.toString().isNotBlank()
     }
 
+    private fun showMoviesError(errorMessage: Int) {
+        binding.loadingProgressBar.visibility = View.GONE
+        binding.moviesRecyclerView.visibility = View.GONE
+        binding.errorLayout.visibility = View.VISIBLE
+        binding.retryButton.visibility = View.VISIBLE
+        binding.errorTextView.setText(errorMessage)
+        binding.stateIconImageView.setImageResource(R.drawable.ic_state_error)
+    }
+
+    private fun getErrorMessage(reason: MovieLoadError): Int {
+        return when (reason) {
+            MovieLoadError.CONNECTION -> R.string.error_connection
+            MovieLoadError.SERVER -> R.string.error_server
+            MovieLoadError.UNKNOWN -> R.string.movies_load_error
+        }
+    }
+
     private fun showPopularState() {
         when (val state = popularLoadStates?.refresh) {
             is LoadState.Loading, null -> {
@@ -271,21 +267,13 @@ class MainActivity : AppCompatActivity() {
                 binding.moviesRecyclerView.visibility = View.VISIBLE
                 binding.errorLayout.visibility = View.GONE
             }
-
             is LoadState.Error -> {
-                binding.loadingProgressBar.visibility = View.GONE
-                binding.moviesRecyclerView.visibility = View.GONE
-                binding.errorLayout.visibility = View.VISIBLE
-                binding.retryButton.visibility = View.VISIBLE
-
                 val errorMessage = when (state.error) {
                     is IOException -> R.string.error_connection
                     is HttpException -> R.string.error_server
                     else -> R.string.movies_load_error
                 }
-
-                binding.errorTextView.setText(errorMessage)
-                binding.stateIconImageView.setImageResource(R.drawable.ic_state_error)
+                showMoviesError(errorMessage)
             }
         }
     }
