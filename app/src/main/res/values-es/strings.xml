@@ -31,4 +31,15 @@
     <string name="recommended_movies">Películas recomendadas</string>
     <string name="share_movie">Compartir película</string>
     <string name="open_homepage">Abrir página oficial</string>
+    <string name="carousel_scroll_hint">Deslizá para ver más →</string>
+    <string name="carousel_scroll_hint_both">← Deslizá en ambos sentidos →</string>
+    <string name="carousel_scroll_hint_back">← Volvé a las anteriores</string>
+    <string name="details_screen_title">Detalles de película</string>
+    <string name="navigate_back">Volver atrás</string>
+    <string name="cinebox_details_loading_movies">Cargando películas…</string>
+    <string name="cinebox_details_similar_empty">No encontramos películas similares por ahora.</string>
+    <string name="cinebox_details_recommended_empty">Todavía no hay recomendaciones para esta película.</string>
+    <string name="cinebox_details_carousel_error">No pudimos cargar las películas. Volvé a intentarlo.</string>
+    <string name="empty_trending">No hay películas en tendencias por ahora.</string>
+    <string name="loading_more_movies">Cargando más películas...</string>
 </resources>

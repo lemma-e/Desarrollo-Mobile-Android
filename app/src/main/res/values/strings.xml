@@ -30,4 +30,16 @@
     <string name="recommended_movies">Recommended movies</string>
     <string name="share_movie">Share movie</string>
     <string name="open_homepage">Open official website</string>
+    <string name="carousel_scroll_hint">Swipe to see more →</string>
+    <string name="carousel_scroll_hint_both">← Swipe in both directions →</string>
+    <string name="carousel_scroll_hint_back">← Swipe to see previous movies</string>
+    <string name="details_screen_title">Movie details</string>
+    <string name="navigate_back">Go back</string>
+    <string name="cinebox_details_loading_movies">Loading movies…</string>
+    <string name="cinebox_details_similar_empty">No similar movies were found for now.</string>
+    <string name="cinebox_details_recommended_empty">There are no recommendations for this movie yet.</string>
+    <string name="cinebox_details_carousel_error">Unable to load these movies. Please try again.</string>
+    <string name="cinebox_brand">CineBox</string>
+    <string name="empty_trending">No trending movies available right now.</string>
+    <string name="loading_more_movies">Loading more movies...</string>
 </resources>

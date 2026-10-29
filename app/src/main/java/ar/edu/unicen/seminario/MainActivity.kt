@@ -28,6 +28,8 @@ import ar.edu.unicen.seminario.ui.watchlist.WatchlistViewModel
 import ar.edu.unicen.seminario.ui.trending.TrendingViewModel
 import android.content.res.Configuration
 import androidx.recyclerview.widget.GridLayoutManager
+import ar.edu.unicen.seminario.ui.SystemBarsHelper
+import androidx.recyclerview.widget.ConcatAdapter
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -41,16 +43,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var trendingViewModel: TrendingViewModel
     private lateinit var trendingAdapter: MovieAdapter
     private var showingTrending = false
+    private lateinit var pagingAdapterConFooter: ConcatAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        SystemBarsHelper.applyInsets(binding.root, false)
         movieAdapter = MovieAdapter { movie -> openMovieDetails(movie) }
         pagingAdapter = MoviePagingAdapter { movie -> openMovieDetails(movie) }
         watchlistAdapter = MovieAdapter { movie -> openMovieDetails(movie) }
         trendingAdapter = MovieAdapter { movie -> openMovieDetails(movie) }
-        val pagingAdapterConFooter = pagingAdapter.withLoadStateFooter(
+        pagingAdapterConFooter = pagingAdapter.withLoadStateFooter(
             footer = MovieLoadStateAdapter {
                 pagingAdapter.retry()
             }
@@ -97,6 +101,7 @@ class MainActivity : AppCompatActivity() {
                     binding.moviesRecyclerView.visibility = View.GONE
                     binding.errorLayout.visibility = View.VISIBLE
                     binding.errorTextView.setText(R.string.empty_watchlist)
+                    binding.stateIconImageView.setImageResource(R.drawable.ic_nav_bookmark)
                     binding.retryButton.visibility = View.GONE
                 } else {
                     binding.moviesRecyclerView.visibility = View.VISIBLE
@@ -125,6 +130,7 @@ class MainActivity : AppCompatActivity() {
                         binding.moviesRecyclerView.visibility = View.GONE
                         binding.errorLayout.visibility = View.VISIBLE
                         binding.errorTextView.setText(R.string.no_search_results)
+                        binding.stateIconImageView.setImageResource(R.drawable.ic_search)
                         binding.retryButton.visibility = View.GONE
                     } else {
                         movieAdapter.updateMovies(state.movies)
@@ -144,51 +150,13 @@ class MainActivity : AppCompatActivity() {
                         MovieLoadError.UNKNOWN -> R.string.movies_load_error
                     }
                     binding.errorTextView.setText(errorMessage)
+                    binding.stateIconImageView.setImageResource(R.drawable.ic_state_error)
                 }
             }
         }
 
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_popular -> {
-                    showingWatchlist = false
-                    showingTrending = false
-                    binding.popularMoviesTitleTextView.setText(R.string.popular_movies)
-                    binding.searchMovieEditText.visibility = View.VISIBLE
-                    if (isSearching()) {
-                        binding.moviesRecyclerView.adapter = movieAdapter
-                        viewModel.searchMovies(binding.searchMovieEditText.text.toString())
-                    } else {
-                        binding.moviesRecyclerView.adapter = pagingAdapterConFooter
-                        showPopularState()
-                    }
-                    true
-                }
-                R.id.navigation_trending -> {
-                    showingWatchlist = false
-                    showingTrending = true
-                    binding.popularMoviesTitleTextView.setText(R.string.trending_movies)
-                    binding.searchMovieEditText.visibility = View.GONE
-                    binding.moviesRecyclerView.adapter = trendingAdapter
-                    binding.loadingProgressBar.visibility = View.VISIBLE
-                    binding.moviesRecyclerView.visibility = View.GONE
-                    binding.errorLayout.visibility = View.GONE
-                    trendingViewModel.loadTrendingMovies()
-                    true
-                }
-                R.id.navigation_watchlist -> {
-                    showingWatchlist = true
-                    binding.popularMoviesTitleTextView.setText(R.string.my_watchlist)
-                    binding.searchMovieEditText.visibility = View.GONE
-                    binding.moviesRecyclerView.adapter = watchlistAdapter
-                    binding.loadingProgressBar.visibility = View.VISIBLE
-                    binding.moviesRecyclerView.visibility = View.GONE
-                    binding.errorLayout.visibility = View.GONE
-                    watchlistViewModel.loadWatchlist()
-                    true
-                }
-                else -> false
-            }
+            showTab(item.itemId)
         }
 
         trendingViewModel.uiState.observe(this) { state ->
@@ -204,8 +172,16 @@ class MainActivity : AppCompatActivity() {
                 is MoviesUiState.Success -> {
                     trendingAdapter.updateMovies(state.movies)
                     binding.loadingProgressBar.visibility = View.GONE
-                    binding.moviesRecyclerView.visibility = View.VISIBLE
-                    binding.errorLayout.visibility = View.GONE
+                    if (state.movies.isEmpty()) {
+                        binding.moviesRecyclerView.visibility = View.GONE
+                        binding.errorLayout.visibility = View.VISIBLE
+                        binding.errorTextView.setText(R.string.empty_trending)
+                        binding.stateIconImageView.setImageResource(R.drawable.ic_nav_trending)
+                        binding.retryButton.visibility = View.GONE
+                    } else {
+                        binding.moviesRecyclerView.visibility = View.VISIBLE
+                        binding.errorLayout.visibility = View.GONE
+                    }
                 }
                 is MoviesUiState.Error -> {
                     binding.loadingProgressBar.visibility = View.GONE
@@ -218,6 +194,7 @@ class MainActivity : AppCompatActivity() {
                         MovieLoadError.UNKNOWN -> R.string.movies_load_error
                     }
                     binding.errorTextView.setText(errorMessage)
+                    binding.stateIconImageView.setImageResource(R.drawable.ic_state_error)
                 }
             }
         }
@@ -270,6 +247,13 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (showingWatchlist) {
+            watchlistViewModel.loadWatchlist()
+        }
+    }
+
     private fun isSearching(): Boolean {
         return binding.searchMovieEditText.text.toString().isNotBlank()
     }
@@ -301,6 +285,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 binding.errorTextView.setText(errorMessage)
+                binding.stateIconImageView.setImageResource(R.drawable.ic_state_error)
             }
         }
     }
@@ -309,5 +294,54 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(this, MovieDetailsActivity::class.java)
         intent.putExtra(MovieDetailsActivity.EXTRA_MOVIE_ID, movie.id)
         startActivity(intent)
+    }
+    private fun showTab(itemId: Int): Boolean {
+        return when (itemId) {
+            R.id.navigation_popular -> {
+                showingWatchlist = false
+                showingTrending = false
+                binding.popularMoviesTitleTextView.setText(R.string.popular_movies)
+                binding.searchMovieInputLayout.visibility = View.VISIBLE
+                if (isSearching()) {
+                    binding.moviesRecyclerView.adapter = movieAdapter
+                    viewModel.searchMovies(
+                        binding.searchMovieEditText.text.toString()
+                    )
+                } else {
+                    binding.moviesRecyclerView.adapter = pagingAdapterConFooter
+                    showPopularState()
+                }
+                true
+            }
+            R.id.navigation_trending -> {
+                showingWatchlist = false
+                showingTrending = true
+                binding.popularMoviesTitleTextView.setText(R.string.trending_movies)
+                binding.searchMovieInputLayout.visibility = View.GONE
+                binding.moviesRecyclerView.adapter = trendingAdapter
+                binding.loadingProgressBar.visibility = View.VISIBLE
+                binding.moviesRecyclerView.visibility = View.GONE
+                binding.errorLayout.visibility = View.GONE
+                trendingViewModel.loadTrendingMovies()
+                true
+            }
+            R.id.navigation_watchlist -> {
+                showingWatchlist = true
+                showingTrending = false
+                binding.popularMoviesTitleTextView.setText(R.string.my_watchlist)
+                binding.searchMovieInputLayout.visibility = View.GONE
+                binding.moviesRecyclerView.adapter = watchlistAdapter
+                binding.loadingProgressBar.visibility = View.VISIBLE
+                binding.moviesRecyclerView.visibility = View.GONE
+                binding.errorLayout.visibility = View.GONE
+                watchlistViewModel.loadWatchlist()
+                true
+            }
+            else -> false
+        }
+    }
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        showTab(binding.bottomNavigationView.selectedItemId)
     }
 }
